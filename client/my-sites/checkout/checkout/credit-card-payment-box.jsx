@@ -2,7 +2,6 @@
  * External dependencies
  */
 import React from 'react';
-import classnames from 'classnames';
 import { some } from 'lodash';
 import { localize } from 'i18n-calypso';
 
@@ -13,7 +12,6 @@ var PayButton = require( './pay-button' ),
 	CreditCardSelector = require( './credit-card-selector' ),
 	TermsOfService = require( './terms-of-service' ),
 	PaymentBox = require( './payment-box' ),
-	analytics = require( 'lib/analytics' ),
 	cartValues = require( 'lib/cart-values' ),
 	transactionStepTypes = require( 'lib/store-transactions/step-types' );
 
@@ -24,6 +22,7 @@ import config from 'config';
 import { PLAN_BUSINESS } from 'lib/plans/constants';
 import ProgressBar from 'components/progress-bar';
 import CartToggle from './cart-toggle';
+import AlternativePaymentMethods from './alternative-payment-methods';
 
 var CreditCardPaymentBox = React.createClass( {
 	getInitialState: function() {
@@ -77,14 +76,6 @@ var CreditCardPaymentBox = React.createClass( {
 		}
 	},
 
-	handleToggle: function( event ) {
-		event.preventDefault();
-
-		analytics.ga.recordEvent( 'Upgrades', 'Clicked Or Use Paypal Link' );
-		analytics.tracks.recordEvent( 'calypso_checkout_switch_to_paypal' );
-		this.props.onToggle( 'paypal' );
-	},
-
 	progressBar: function() {
 		return (
 			<div className="credit-card-payment-box__progress-bar">
@@ -99,10 +90,7 @@ var CreditCardPaymentBox = React.createClass( {
 			hasBusinessPlanInCart = some( cart.products, { product_slug: PLAN_BUSINESS } ),
 			showPaymentChatButton = config.isEnabled( 'upgrades/presale-chat' ) &&
 				abtest( 'presaleChatButton' ) === 'showChatButton' &&
-				hasBusinessPlanInCart,
-			paypalButtonClasses = classnames( 'credit-card-payment-box__switch-link', {
-				'credit-card-payment-box__switch-link-left': showPaymentChatButton,
-			} );
+				hasBusinessPlanInCart;
 
 		return (
 			<div className="payment-box__payment-buttons">
@@ -110,15 +98,12 @@ var CreditCardPaymentBox = React.createClass( {
 					cart={ this.props.cart }
 					transactionStep={ this.props.transactionStep } />
 
-				{ cartValues.isPayPalExpressEnabled( cart )
-					? <a className={ paypalButtonClasses } href="" onClick={ this.handleToggle }>
-						{ this.props.translate( 'or use {{paypal/}}', {
-							components: {
-								paypal: <img src="/calypso/images/upgrades/paypal.svg" alt="PayPal" width="80" />
-							}
-						} ) }</a>
-					: null
-				}
+				<AlternativePaymentMethods
+					cart={ this.props.cart }
+					paymentMethods={ this.props.paymentMethods }
+					selectedPaymentMethod="credit-card"
+					onSelectPaymentMethod={ this.props.onSelectPaymentMethod }
+					/>
 
 				<CartCoupon cart={ cart } />
 
@@ -174,6 +159,7 @@ var CreditCardPaymentBox = React.createClass( {
 			</form>
 		);
 	},
+
 
 	render: function() {
 		return (
