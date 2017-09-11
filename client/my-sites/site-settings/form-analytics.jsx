@@ -1,9 +1,10 @@
 /**
  * External dependencies
  */
+import config from 'config';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { flowRight, partialRight, pick, overSome } from 'lodash';
+import { find, flowRight, partialRight, pick, overSome } from 'lodash';
 
 /**
  * Internal dependencies
@@ -14,9 +15,13 @@ import Button from 'components/button';
 import SectionHeader from 'components/section-header';
 import ExternalLink from 'components/external-link';
 import Banner from 'components/banner';
+import CompactFormToggle from 'components/forms/form-toggle/compact';
+import { getPlugins } from 'state/plugins/installed/selectors';
 import FormLabel from 'components/forms/form-label';
+import FormSettingExplanation from 'components/forms/form-setting-explanation';
 import FormTextInput from 'components/forms/form-text-input';
 import FormTextValidation from 'components/forms/form-input-validation';
+import FormAnalyticsStores from './form-analytics-stores';
 import Notice from 'components/notice';
 import NoticeAction from 'components/notice/notice-action';
 import {
@@ -39,14 +44,30 @@ class GoogleAnalyticsForm extends Component {
 		isCodeValid: true
 	};
 
+	handleFieldChange = ( key, value ) => {
+		const { fields, updateFields } = this.props;
+		const updatedWgaFields = Object.assign( {}, fields.wga || {}, { [ key ]: value } );
+		updateFields( { wga: updatedWgaFields } );
+	}
+
 	handleCodeChange = ( event ) => {
 		const code = event.target.value;
 
 		this.setState( {
 			isCodeValid: validateGoogleAnalyticsCode( code )
 		} );
-		this.props.updateFields( { wga: { code } } );
+		this.handleFieldChange( 'code', code );
 	};
+
+	handleToggleChange = ( key ) => {
+		const { fields } = this.props;
+		const value = fields.wga ? ! fields.wga[ key ] : false;
+		this.handleFieldChange( key, value );
+	}
+
+	handleAnonymizeChange = () => {
+		this.handleToggleChange( 'anonymize' );
+	}
 
 	isSubmitButtonDisabled() {
 		const { isRequestingSettings, isSavingSettings } = this.props;
@@ -65,6 +86,7 @@ class GoogleAnalyticsForm extends Component {
 			jetpackVersionSupportsModule,
 			showUpgradeNudge,
 			site,
+			sitePlugins,
 			siteId,
 			siteIsJetpack,
 			siteSlug,
@@ -77,6 +99,10 @@ class GoogleAnalyticsForm extends Component {
 		const analyticsSupportUrl = siteIsJetpack
 			? 'https://jetpack.com/support/google-analytics/'
 			: 'https://support.wordpress.com/google-analytics/';
+		const showAnalyticsForStores = config.isEnabled( 'jetpack/google-analytics-for-stores' );
+		const showAnonymizeIP = config.isEnabled( 'jetpack/google-analytics-anonymize-ip' );
+		const wooCommercePlugin = find( sitePlugins, { slug: 'woocommerce' } );
+		const wooCommerceActive = wooCommercePlugin ? wooCommercePlugin.active : false;
 
 		return (
 			<form id="site-settings" onSubmit={ handleSubmitForm }>
@@ -168,6 +194,34 @@ class GoogleAnalyticsForm extends Component {
 									{ translate( 'Where can I find my Tracking ID?' ) }
 								</ExternalLink>
 							</fieldset>
+							{ showAnonymizeIP &&
+								<fieldset>
+									<CompactFormToggle
+										checked={ fields.wga ? fields.wga.anonymize : false }
+										disabled={ isRequestingSettings || ! enableForm }
+										onChange={ this.handleAnonymizeChange }
+									>
+										{ translate(
+											'Anonymize IP addresses'
+										) }
+									</CompactFormToggle>
+									<FormSettingExplanation>
+										{
+											translate(
+												'Enabling this option is mandatory in certain countries due to national ' +
+												'privacy laws.'
+											)
+										}
+									</FormSettingExplanation>
+								</fieldset>
+							}
+							{
+								showAnalyticsForStores && wooCommerceActive &&
+								<FormAnalyticsStores
+									fields={ fields }
+									handleToggleChange={ this.handleToggleChange }
+								/>
+							}
 							<p>
 								{ translate(
 									'Google Analytics is a free service that complements our {{a}}built-in stats{{/a}} ' +
@@ -221,6 +275,7 @@ const mapStateToProps = ( state ) => {
 		! siteIsJetpack ||
 		( siteIsJetpack && jetpackModuleActive && jetpackVersionSupportsModule )
 	);
+	const sitePlugins = site ? getPlugins( state, [ site.ID ] ) : [];
 
 	return {
 		site,
@@ -232,6 +287,7 @@ const mapStateToProps = ( state ) => {
 		jetpackManagementUrl,
 		jetpackModuleActive,
 		jetpackVersionSupportsModule,
+		sitePlugins,
 	};
 };
 
