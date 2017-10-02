@@ -22,6 +22,7 @@ import {
 import { recordTracksEvent } from 'state/analytics/actions';
 import WpcomLoginForm from 'signup/wpcom-login-form';
 import { InfoNotice } from 'blocks/global-notice';
+import { login } from 'lib/paths';
 
 class SocialLoginForm extends Component {
 	static propTypes = {
@@ -118,6 +119,9 @@ class SocialLoginForm extends Component {
 	}
 
 	render() {
+		const isPopup = window.opener && window.opener !== window;
+		const redirectUri = isPopup ? login( { isNative: true, socialService: 'google' } ) : null;
+
 		return (
 			<div className="login__social">
 				{ this.renderText() }
@@ -126,6 +130,7 @@ class SocialLoginForm extends Component {
 					<GoogleLoginButton
 						clientId={ config( 'google_oauth_client_id' ) }
 						responseHandler={ this.handleGoogleResponse }
+						redirectUri={ redirectUri }
 						onClick={ this.trackGoogleLogin } />
 				</div>
 
