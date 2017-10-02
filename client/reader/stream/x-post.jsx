@@ -20,6 +20,7 @@ import { getSite } from 'state/reader/sites/selectors';
 import { getFeed } from 'state/reader/feeds/selectors';
 import QueryReaderSite from 'components/data/query-reader-site';
 import QueryReaderFeed from 'components/data/query-reader-feed';
+import Emojify from 'components/emojify';
 
 class CrossPost extends PureComponent {
 	static propTypes = {
@@ -149,7 +150,7 @@ class CrossPost extends PureComponent {
 	};
 
 	render() {
-		const { post, postKey, site, feed } = this.props;
+		const { post, postKey, site, feed, translate } = this.props;
 		const { blogId: siteId, feedId } = postKey;
 		const siteIcon = get( site, 'icon.img' );
 		const feedIcon = get( feed, 'image' );
@@ -164,6 +165,10 @@ class CrossPost extends PureComponent {
 		// TODO: maybe add xpost metadata, so we can remove this regex
 		let xpostTitle = post.title;
 		xpostTitle = xpostTitle.replace( /x-post:/i, '' );
+
+		if ( ! xpostTitle ) {
+			xpostTitle = `(${ translate( 'no title' ) })`;
+		}
 
 		return (
 			<Card tagName="article" onClick={ this.handleCardClick } className={ articleClasses }>
@@ -184,11 +189,11 @@ class CrossPost extends PureComponent {
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								{ xpostTitle }
+								<Emojify>{ xpostTitle }</Emojify>
 							</a>
 						</h1>
 					) }
-					{ this.getDescription( post.author.first_name ) }
+					<Emojify>{ this.getDescription( post.author.first_name ) }</Emojify>
 				</div>
 				{ feedId && <QueryReaderFeed feedId={ +feedId } includeMeta={ false } /> }
 				{ siteId && <QueryReaderSite siteId={ +siteId } includeMeta={ false } /> }
