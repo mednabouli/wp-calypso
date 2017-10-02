@@ -48,6 +48,8 @@ class Login extends Component {
 		socialConnect: PropTypes.bool,
 		isLinking: PropTypes.bool,
 		linkingSocialService: PropTypes.string,
+		socialService: PropTypes.string,
+		socialServiceResponse: PropTypes.object,
 	};
 
 	componentDidMount = () => {
@@ -197,6 +199,8 @@ class Login extends Component {
 			twoFactorEnabled,
 			twoFactorNotificationSent,
 			socialConnect,
+			socialService,
+			socialServiceResponse,
 		} = this.props;
 
 		let poller;
@@ -231,7 +235,11 @@ class Login extends Component {
 		}
 
 		return (
-			<LoginForm onSuccess={ this.handleValidLogin } privateSite={ privateSite } />
+			<LoginForm
+				onSuccess={ this.handleValidLogin }
+				privateSite={ privateSite }
+				socialService={ socialService }
+				socialServiceResponse={ socialServiceResponse } />
 		);
 	}
 

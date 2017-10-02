@@ -35,6 +35,8 @@ export class Login extends React.Component {
 		translate: PropTypes.func.isRequired,
 		twoFactorAuthType: PropTypes.string,
 		socialConnect: PropTypes.bool,
+		socialService: PropTypes.string,
+		socialServiceResponse: PropTypes.object,
 	};
 
 	componentDidMount() {
@@ -132,6 +134,8 @@ export class Login extends React.Component {
 			privateSite,
 			socialConnect,
 			twoFactorAuthType,
+			socialService,
+			socialServiceResponse,
 		} = this.props;
 
 		if ( privateSite && isLoggedIn ) {
@@ -147,6 +151,8 @@ export class Login extends React.Component {
 				privateSite={ privateSite }
 				clientId={ clientId }
 				oauth2Client={ oauth2Client }
+				socialService={ socialService }
+				socialServiceResponse={ socialServiceResponse }
 			/>
 		);
 	}

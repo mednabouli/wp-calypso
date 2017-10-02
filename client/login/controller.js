@@ -19,7 +19,7 @@ const enhanceContextWithLogin = context => {
 	const {
 		lang,
 		path,
-		params: { flow, twoFactorAuthType },
+		params: { flow, twoFactorAuthType, socialService },
 	} = context;
 
 	context.cacheQueryKeys = [ 'client_id' ];
@@ -29,6 +29,8 @@ const enhanceContextWithLogin = context => {
 			locale={ lang }
 			path={ path }
 			twoFactorAuthType={ twoFactorAuthType }
+			socialService={ socialService }
+			socialServiceResponse={ context.hash }
 			socialConnect={ flow === 'social-connect' }
 			privateSite={ flow === 'private-site' }
 		/>

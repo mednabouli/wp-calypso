@@ -51,6 +51,8 @@ export class LoginForm extends Component {
 		translate: PropTypes.func.isRequired,
 		isFormDisabled: PropTypes.bool,
 		oauth2Client: PropTypes.object,
+		socialService: PropTypes.string,
+		socialServiceResponse: PropTypes.object,
 	};
 
 	state = {
@@ -285,6 +287,8 @@ export class LoginForm extends Component {
 					<Card className="login__form-social">
 						<SocialLoginForm
 							onSuccess={ this.props.onSuccess }
+							socialService={ this.props.socialService }
+							socialServiceResponse={ this.props.socialServiceResponse }
 							linkingSocialService={ this.props.socialAccountIsLinking
 								? this.props.socialAccountLinkService
 								: null
