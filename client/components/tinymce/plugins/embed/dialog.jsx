@@ -3,6 +3,7 @@
  */
 import PropTypes from 'prop-types';
 import React from 'react';
+import { localize } from 'i18n-calypso';
 
 /**
  * Internal dependencies
@@ -10,7 +11,6 @@ import React from 'react';
 import Button from 'components/button';
 import Dialog from 'components/dialog';
 import FormTextInput from 'components/forms/form-text-input';
-import { localize } from 'i18n-calypso';
 
 /*
  * Shows the URL of am embed and allows it to be edited.
@@ -73,15 +73,15 @@ export class EmbedDialog extends React.Component {
 	};
 
 	render() {
-		const { translate } = this.props,
-			dialogButtons = [
-				<Button onClick={ this.props.onCancel }>
-					{ translate( 'Cancel' ) }
-				</Button>,
-				<Button primary onClick={ this.onUpdate }>
-					{ translate( 'Update' ) }
-				</Button>
-			];
+		const { translate } = this.props;
+		const dialogButtons = [
+			<Button onClick={ this.props.onCancel }>
+				{ translate( 'Cancel' ) }
+			</Button>,
+			<Button primary onClick={ this.onUpdate }>
+				{ translate( 'Update' ) }
+			</Button>
+		];
 
 		return (
 			<Dialog

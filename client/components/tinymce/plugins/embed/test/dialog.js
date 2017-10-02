@@ -16,8 +16,8 @@ import { EmbedDialog } from '../dialog';
 
 describe( 'EmbedDialog', function() {
 	it( 'should render', function() {
-		const url = 'https://www.youtube.com/watch?v=JkOIhs2mHpc',
-			wrapper = shallow(
+		const url = 'https://www.youtube.com/watch?v=JkOIhs2mHpc';
+		const wrapper = shallow(
 			<EmbedDialog
 				embedUrl={ url }
 				onCancel={ noop }
@@ -33,22 +33,22 @@ describe( 'EmbedDialog', function() {
 	} );
 
 	it( "should update the input field's value when input changes", function() {
-		const originalUrl = 'https://www.youtube.com/watch?v=ghrL82cc-ss',
-			newUrl = 'https://videopress.com/v/DNgJlco8',
-			wrapper = shallow(
-				<EmbedDialog
-					embedUrl={ originalUrl }
-					onCancel={ noop }
-					onUpdate={ noop }
-					translate={ identity }
-				/>
-			),
-			mockChangeEvent = {
-				target: {
-					value: newUrl,
-					focus: noop,
-				}
-			};
+		const originalUrl = 'https://www.youtube.com/watch?v=ghrL82cc-ss';
+		const newUrl = 'https://videopress.com/v/DNgJlco8';
+		const wrapper = shallow(
+			<EmbedDialog
+				embedUrl={ originalUrl }
+				onCancel={ noop }
+				onUpdate={ noop }
+				translate={ identity }
+			/>
+		);
+		const mockChangeEvent = {
+			target: {
+				value: newUrl,
+				focus: noop,
+			}
+		};
 		let inputField = wrapper.find( FormTextInput ).get( 0 );
 
 		assert.strictEqual( inputField.props.defaultValue, originalUrl );
@@ -58,14 +58,14 @@ describe( 'EmbedDialog', function() {
 	} );
 
 	it( 'should return the new url to onUpdate when updating', function() {
-		const originalUrl = 'https://www.youtube.com/watch?v=R54QEvTyqO4',
-			newUrl = 'https://videopress.com/v/x4IYthy7',
-			mockChangeEvent = {
-				target: {
-					value: newUrl,
-					focus: noop,
-				}
-			};
+		const originalUrl = 'https://www.youtube.com/watch?v=R54QEvTyqO4';
+		const newUrl = 'https://videopress.com/v/x4IYthy7';
+		const mockChangeEvent = {
+			target: {
+				value: newUrl,
+				focus: noop,
+			}
+		};
 		let currentUrl = originalUrl;
 		const onUpdate = ( url ) => {
 			currentUrl = url;
@@ -86,15 +86,15 @@ describe( 'EmbedDialog', function() {
 	} );
 
 	it( 'should not return the new url to onUpdate when canceling', function() {
-		const originalUrl = 'https://www.youtube.com/watch?v=JkOIhs2mHpc',
-			newUrl = 'https://videopress.com/v/GtWYbzhZ',
-			mockChangeEvent = {
-				target: {
-					value: newUrl,
-					focus: noop,
-				}
-			},
-			noopSpy = spy( noop );
+		const originalUrl = 'https://www.youtube.com/watch?v=JkOIhs2mHpc';
+		const newUrl = 'https://videopress.com/v/GtWYbzhZ';
+		const mockChangeEvent = {
+			target: {
+				value: newUrl,
+				focus: noop,
+			}
+		};
+		const noopSpy = spy( noop );
 		let currentUrl = originalUrl;
 		const onUpdate = ( url ) => {
 			currentUrl = url;

@@ -24,16 +24,16 @@ const embed = ( editor ) => {
 	 * @param {boolean} visible `true` makes the dialog visible; `false` hides it.
 	 */
 	const render = ( visible = true ) => {
-		const selectedEmbedNode = editor.selection.getNode(),
-			embedDialogProps = {
-				embedUrl: selectedEmbedNode.innerText || selectedEmbedNode.textContent,
-				isVisible: visible,
-				onCancel: () => render( false ),
-				onUpdate: ( newUrl ) => {
-					editor.execCommand( 'mceInsertContent', false, newUrl );
-					render( false );
-				},
-			};
+		const selectedEmbedNode = editor.selection.getNode();
+		const embedDialogProps = {
+			embedUrl: selectedEmbedNode.innerText || selectedEmbedNode.textContent,
+			isVisible: visible,
+			onCancel: () => render( false ),
+			onUpdate: ( newUrl ) => {
+				editor.execCommand( 'mceInsertContent', false, newUrl );
+				render( false );
+			},
+		};
 
 		ReactDom.render( React.createElement( EmbedDialog, embedDialogProps ), embedDialogContainer );
 
@@ -44,7 +44,7 @@ const embed = ( editor ) => {
 		}
 	};
 
-	editor.addCommand( 'embedDialog', render );
+	editor.addCommand( 'embedDialog', () => render() );
 
 	editor.on( 'init', () => {
 		embedDialogContainer = editor.getContainer().appendChild(
