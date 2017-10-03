@@ -108,7 +108,6 @@ module.exports = React.createClass( {
 			relativeTimeClass = ( timeText ) ? 'post-relative-time-status' : null,
 			innerText = ( <span>{ timeText }{ statusText }</span> ),
 			time = this.getTimestamp();
-
 		if ( this.props.link ) {
 			const rel = this.props.target === '_blank' ? 'noopener noreferrer' : null;
 			innerText = (
