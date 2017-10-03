@@ -13,6 +13,7 @@ import {
 	receiveError,
 	updateUploadProgress,
 } from '../';
+import { recordTracksEvent } from 'state/analytics/actions';
 import { getAutomatedTransferStatus } from 'state/automated-transfer/actions';
 import {
 	pluginUploadError,
@@ -26,6 +27,18 @@ const ERROR_RESPONSE = {
 	message: 'Invalid file type.',
 };
 
+const INITIATE_SUCCESS_RESPONSE = {
+	success: true,
+	status: 'uploading',
+	transfer_id: 1,
+};
+
+const INITIATE_FAILURE_RESPONSE = {
+	success: false,
+	status: '',
+	transfer_id: 0,
+};
+
 describe( 'initiateTransferWithPluginZip', () => {
 	it( 'should dispatch an http request', () => {
 		const dispatch = sinon.spy();
@@ -36,14 +49,53 @@ describe( 'initiateTransferWithPluginZip', () => {
 			formData: [ [ 'plugin_zip', 'foo' ] ],
 		} );
 	} );
+
+	it( 'should dispatch a tracks call', () => {
+		const dispatch = sinon.spy();
+		initiateTransferWithPluginZip( { dispatch }, { siteId, pluginZip: 'foo' } );
+		expect( dispatch ).to.have.been.calledWith(
+			recordTracksEvent( 'calypso_automated_transfer_inititate_transfer', {
+				context: 'plugin_upload',
+			} )
+		);
+	} );
 } );
 
 describe( 'receiveResponse', () => {
 	it( 'should dispatch a status request', () => {
 		const dispatch = sinon.spy();
-		receiveResponse( { dispatch }, { siteId } );
+		receiveResponse( { dispatch }, { siteId }, INITIATE_SUCCESS_RESPONSE );
 		expect( dispatch ).to.have.been.calledWith(
 			getAutomatedTransferStatus( siteId )
+		);
+	} );
+
+	it( 'should dispatch a tracks call', () => {
+		const dispatch = sinon.spy();
+		receiveResponse( { dispatch }, { siteId }, INITIATE_SUCCESS_RESPONSE );
+		expect( dispatch ).to.have.been.calledWith(
+			recordTracksEvent( 'calypso_automated_transfer_inititate_success', {
+				context: 'plugin_upload',
+			} )
+		);
+	} );
+
+	it( 'should dispatch error notice on unsuccessful initiation', () => {
+		const dispatch = sinon.spy();
+		receiveResponse( { dispatch }, { siteId }, INITIATE_FAILURE_RESPONSE );
+		expect( dispatch ).to.have.been.calledWithMatch( {
+			notice: { text: 'The uploaded file is not a valid plugin.' },
+		} );
+	} );
+
+	it( 'should dispatch a tracks call on unsuccessful initiation', () => {
+		const dispatch = sinon.spy();
+		receiveResponse( { dispatch }, { siteId }, INITIATE_FAILURE_RESPONSE );
+		expect( dispatch ).to.have.been.calledWith(
+			recordTracksEvent( 'calypso_automated_transfer_inititate_failure', {
+				context: 'plugin_upload',
+				error: 'api_success_false',
+			} )
 		);
 	} );
 } );
@@ -52,7 +104,6 @@ describe( 'receiveError', () => {
 	it( 'should dispatch a plugin upload error', () => {
 		const dispatch = sinon.spy();
 		receiveError( { dispatch }, { siteId }, ERROR_RESPONSE );
-		expect( dispatch ).to.have.been.calledTwice;
 		expect( dispatch ).to.have.been.calledWith(
 			pluginUploadError( siteId, ERROR_RESPONSE )
 		);
@@ -61,10 +112,20 @@ describe( 'receiveError', () => {
 	it( 'should dispatch an error notice', () => {
 		const dispatch = sinon.spy();
 		receiveError( { dispatch }, { siteId }, ERROR_RESPONSE );
-		expect( dispatch ).to.have.been.calledTwice;
 		expect( dispatch ).to.have.been.calledWithMatch( {
-			notice: { text: 'Not a valid zip file.' }
+			notice: { text: 'The uploaded file is not a valid zip.' },
 		} );
+	} );
+
+	it( 'should dispatch a tracks call', () => {
+		const dispatch = sinon.spy();
+		receiveError( { dispatch }, { siteId }, ERROR_RESPONSE );
+		expect( dispatch ).to.have.been.calledWith(
+			recordTracksEvent( 'calypso_automated_transfer_inititate_failure', {
+				context: 'plugin_upload',
+				error: 'invalid_input',
+			} )
+		);
 	} );
 } );
 

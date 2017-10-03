@@ -7,6 +7,7 @@ import { translate } from 'i18n-calypso';
  * Internal dependencies
  */
 import { AUTOMATED_TRANSFER_INITIATE_WITH_PLUGIN_ZIP } from 'state/action-types';
+import { recordTracksEvent } from 'state/analytics/actions';
 import { dispatchRequest } from 'state/data-layer/wpcom-http/utils';
 import { errorNotice } from 'state/notices/actions';
 import { http } from 'state/data-layer/wpcom-http/actions';
@@ -22,6 +23,11 @@ import { getAutomatedTransferStatus } from 'state/automated-transfer/actions';
 export const initiateTransferWithPluginZip = ( { dispatch }, action ) => {
 	const { siteId, pluginZip } = action;
 
+	dispatch( recordTracksEvent(
+		'calypso_automated_transfer_inititate_transfer',
+		{ context: 'plugin_upload' }
+	) );
+
 	dispatch( http( {
 		method: 'POST',
 		path: `/sites/${ siteId }/automated-transfers/initiate`,
@@ -30,18 +36,20 @@ export const initiateTransferWithPluginZip = ( { dispatch }, action ) => {
 	}, action ) );
 };
 
-export const receiveResponse = ( { dispatch }, { siteId } ) => {
-	dispatch( getAutomatedTransferStatus( siteId ) );
-};
-
 const showErrorNotice = ( dispatch, error ) => {
 	if ( error.error === 'invalid_input' ) {
-		dispatch( errorNotice( translate( 'Not a valid zip file.' ) ) );
+		dispatch( errorNotice( translate( 'The uploaded file is not a valid zip.' ) ) );
 		return;
 	}
+
+	if ( error.error === 'api_success_false' ) {
+		dispatch( errorNotice( translate( 'The uploaded file is not a valid plugin.' ) ) );
+		return;
+	}
+
 	if ( error.error ) {
 		dispatch( errorNotice( translate( 'Upload problem: %(error)s.', {
-			args: { error: error.error }
+			args: { error: error.error },
 		} ) ) );
 		return;
 	}
@@ -49,8 +57,25 @@ const showErrorNotice = ( dispatch, error ) => {
 };
 
 export const receiveError = ( { dispatch }, { siteId }, error ) => {
+	dispatch( recordTracksEvent( 'calypso_automated_transfer_inititate_failure', {
+		context: 'plugin_upload',
+		error: error.error,
+	} ) );
 	showErrorNotice( dispatch, error );
 	dispatch( pluginUploadError( siteId, error ) );
+};
+
+export const receiveResponse = ( { dispatch }, { siteId }, { success } ) => {
+	if ( success === false ) {
+		receiveError( { dispatch }, { siteId }, { error: 'api_success_false' } );
+		return;
+	}
+
+	dispatch( recordTracksEvent(
+		'calypso_automated_transfer_inititate_success',
+		{ context: 'plugin_upload' }
+	) );
+	dispatch( getAutomatedTransferStatus( siteId ) );
 };
 
 export const updateUploadProgress = ( { dispatch }, { siteId }, { loaded, total } ) => {
@@ -64,5 +89,5 @@ export default {
 		receiveResponse,
 		receiveError,
 		{ onProgress: updateUploadProgress }
-	) ]
+	) ],
 };
