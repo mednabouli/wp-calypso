@@ -2,51 +2,62 @@
  * External dependencies
  */
 import IO from 'socket.io-client';
-import { EventEmitter } from 'events';
-import config from 'config';
 import { v4 as uuid } from 'uuid';
 
 /**
  * Internal dependencies
  */
-import { HAPPYCHAT_MESSAGE_TYPES } from 'state/happychat/constants';
+import {
+	HAPPYCHAT_MESSAGE_TYPES
+} from 'state/happychat/constants';
+import {
+	receiveChatEvent,
+	requestChatTranscript,
+	setConnected,
+	setConnecting,
+	setDisconnected,
+	setHappychatAvailable,
+	setHappychatChatStatus,
+	setReconnecting,
+} from 'state/happychat/actions';
 
-/*
- * Happychat client connection for Socket.IO
- */
 const debug = require( 'debug' )( 'calypso:happychat:connection' );
 
-class Connection extends EventEmitter {
+const isString = ( socket ) => ( typeof socket === 'string' || socket instanceof String );
+const buildConnection = ( socket ) => isString( socket )
+	? new IO( socket ) // If socket is an URL, connect to server.
+	: socket; // If socket is not an url, use it directly. Useful for testing.
 
-	open( signer_user_id, jwt, locale, groups ) {
+class Connection {
+
+	init( url, dispatch, auth ) {
+		dispatch( setConnecting() );
+		return auth()
+			.then( ( user ) => this.open( buildConnection( url ), dispatch, user ) )
+			.catch( ( e ) => debug( 'failed to start happychat session', e, e.stack ) );
+	}
+
+	open( socket, dispatch, { signer_user_id, jwt, locale, groups, geo_location } ) {
 		if ( ! this.openSocket ) {
 			this.openSocket = new Promise( resolve => {
-				const url = config( 'happychat_url' );
-				const socket = new IO( url );
+				// TODO: reject this promise
 				socket
-					.once( 'connect', () => debug( 'connected' ) )
+					.once( 'connect', () => {} )
+					.on( 'token', handler => handler( { signer_user_id, jwt, locale, groups } ) )
 					.on( 'init', () => {
-						this.emit( 'connected' );
+						dispatch( setConnected( { signer_user_id, locale, groups, geo_location } ) );
+						dispatch( requestChatTranscript() );
 						resolve( socket );
 					} )
-					.on( 'token', handler => {
-						handler( { signer_user_id, jwt, locale, groups } );
-					} )
-					.on( 'unauthorized', () => {
-						socket.close();
-						debug( 'not authorized' );
-					} )
-					.on( 'disconnect', reason => this.emit( 'disconnect', reason ) )
-					.on( 'reconnecting', () => this.emit( 'reconnecting' ) )
-					// Received a chat message
-					.on( 'message', message => this.emit( 'message', message ) )
-					// Received chat status new/assigning/assigned/missed/pending/abandoned
-					.on( 'status', status => this.emit( 'status', status ) )
-					// If happychat is currently accepting chats
-					.on( 'accept', accept => this.emit( 'accept', accept ) );
+					.on( 'unauthorized', () => socket.close() )
+					.on( 'disconnect', reason => dispatch( setDisconnected( reason ) ) )
+					.on( 'reconnecting', () => dispatch( setReconnecting() ) )
+					.on( 'status', status => dispatch( setHappychatChatStatus( status ) ) )
+					.on( 'accept', accept => dispatch( setHappychatAvailable( accept ) ) )
+					.on( 'message', message => dispatch( receiveChatEvent( message ) ) );
 			} );
 		} else {
-			debug( 'socket already initiaized' );
+			debug( 'socket already initialized' );
 		}
 		return this.openSocket;
 	}
@@ -143,4 +154,4 @@ class Connection extends EventEmitter {
 
 }
 
-export default () => new Connection();
+export default ( ) => new Connection( );

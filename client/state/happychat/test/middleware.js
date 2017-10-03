@@ -15,18 +15,10 @@ import wpcom from 'lib/wp';
 import {
 	ANALYTICS_EVENT_RECORD,
 	HAPPYCHAT_BLUR,
-	HAPPYCHAT_CONNECTED,
-	HAPPYCHAT_CONNECTING,
-	HAPPYCHAT_DISCONNECTED,
-	HAPPYCHAT_RECEIVE_EVENT,
-	HAPPYCHAT_RECONNECTING,
 	HAPPYCHAT_SEND_USER_INFO,
 	HAPPYCHAT_SEND_MESSAGE,
 	HAPPYCHAT_SET_MESSAGE,
-	HAPPYCHAT_SET_AVAILABLE,
-	HAPPYCHAT_SET_CHAT_STATUS,
 	HAPPYCHAT_TRANSCRIPT_RECEIVE,
-	HAPPYCHAT_TRANSCRIPT_REQUEST,
 } from 'state/action-types';
 import middleware, {
 	connectChat,
@@ -72,12 +64,8 @@ describe( 'middleware', () => {
 
 		useSandbox( sandbox => {
 			connection = {
-				on: sandbox.stub(),
-				open: sandbox.stub().returns( Promise.resolve() )
+				init: sandbox.stub().returns( Promise.resolve() )
 			};
-			// Need to add return value after re-assignment, otherwise it will return
-			// a reference to the previous (undefined) connection variable.
-			connection.on.returns( connection );
 
 			dispatch = sandbox.stub();
 			getState = sandbox.stub();
@@ -91,7 +79,7 @@ describe( 'middleware', () => {
 			return Promise.all( [
 				connectChat( connection, { dispatch, getState: getState.returns( connectedState ) } ),
 				connectChat( connection, { dispatch, getState: getState.returns( connectingState ) } ),
-			] ).then( () => expect( connection.on ).not.to.have.been.called );
+			] ).then( () => expect( connection.init ).not.to.have.been.called );
 		} );
 
 		describe( 'when Happychat is uninitialized', () => {
@@ -103,40 +91,7 @@ describe( 'middleware', () => {
 				getState.returns( uninitializedState );
 				return connectChat( connection, { dispatch, getState } )
 					.then( () => {
-						expect( connection.open ).to.have.been.calledOnce;
-						expect( dispatch ).to.have.been.calledWith( { type: HAPPYCHAT_CONNECTING } );
-					} );
-			} );
-
-			it( 'should set up listeners for various connection events', () => {
-				return connectChat( connection, { dispatch, getState } )
-					.then( () => {
-						expect( connection.on.callCount ).to.equal( 6 );
-
-						// Ensure 'connect' listener was connected by executing a fake message event
-						connection.on.withArgs( 'connected' ).firstCall.args[ 1 ]( true );
-						expect( dispatch ).to.have.been.calledWith( { type: HAPPYCHAT_CONNECTED } );
-						expect( dispatch ).to.have.been.calledWith( { type: HAPPYCHAT_TRANSCRIPT_REQUEST } );
-
-						// Ensure 'disconnect' listener was connected by executing a fake message event
-						connection.on.withArgs( 'disconnect' ).firstCall.args[ 1 ]( 'abc' );
-						expect( dispatch ).to.have.been.calledWith( { type: HAPPYCHAT_DISCONNECTED, errorStatus: 'abc' } );
-
-						// Ensure 'reconnecting' listener was connected by executing a fake message event
-						connection.on.withArgs( 'reconnecting' ).firstCall.args[ 1 ]();
-						expect( dispatch ).to.have.been.calledWith( { type: HAPPYCHAT_RECONNECTING } );
-
-						// Ensure 'accept' listener was connected by executing a fake message event
-						connection.on.withArgs( 'accept' ).firstCall.args[ 1 ]( true );
-						expect( dispatch ).to.have.been.calledWith( { type: HAPPYCHAT_SET_AVAILABLE, isAvailable: true } );
-
-						// Ensure 'message' listener was connected by executing a fake message event
-						connection.on.withArgs( 'message' ).firstCall.args[ 1 ]( 'some event' );
-						expect( dispatch ).to.have.been.calledWith( { type: HAPPYCHAT_RECEIVE_EVENT, event: 'some event' } );
-
-						// Ensure 'message' listener was connected by executing a fake message event
-						connection.on.withArgs( 'status' ).firstCall.args[ 1 ]( 'ready' );
-						expect( dispatch ).to.have.been.calledWith( { type: HAPPYCHAT_SET_CHAT_STATUS, status: 'ready' } );
+						expect( connection.init ).to.have.been.calledOnce;
 					} );
 			} );
 		} );
@@ -242,11 +197,8 @@ describe( 'middleware', () => {
 		useSandbox( sandbox => {
 			sandbox.stub( selectors, 'wasHappychatRecentlyActive' );
 			connection = {
-				on: sandbox.stub()
+				init: sandbox.stub().returns( Promise.resolve() )
 			};
-			// Need to add return value after re-assignment, otherwise it will return
-			// a reference to the previous (undefined) connection variable.
-			connection.on.returns( connection );
 			store = {
 				dispatch: noop,
 				getState: sandbox.stub().returns( uninitializedState ),
@@ -256,13 +208,13 @@ describe( 'middleware', () => {
 		it( 'should connect the chat if user was recently connected', () => {
 			selectors.wasHappychatRecentlyActive.returns( true );
 			connectIfRecentlyActive( connection, store );
-			expect( connection.on ).to.have.been.called;
+			expect( connection.init ).to.have.been.called;
 		} );
 
 		it( 'should not connect the chat if user was not recently connected', () => {
 			selectors.wasHappychatRecentlyActive.returns( false );
 			connectIfRecentlyActive( connection, store );
-			expect( connection.on ).not.to.have.been.called;
+			expect( connection.init ).not.to.have.been.called;
 		} );
 	} );
 

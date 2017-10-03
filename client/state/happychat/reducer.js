@@ -30,7 +30,6 @@ import {
 	HAPPYCHAT_RECONNECTING,
 	HAPPYCHAT_SET_CHAT_STATUS,
 	HAPPYCHAT_TRANSCRIPT_RECEIVE,
-	HAPPYCHAT_SET_GEO_LOCATION,
 } from 'state/action-types';
 import { combineReducers, createReducer, isValidStateWithSchema } from 'state/utils';
 import {
@@ -77,7 +76,13 @@ const sortTimeline = timeline => sortBy( timeline, event => parseInt( event.time
  * @return {Object}        Updated state
  */
 export const geoLocation = createReducer( null, {
-	[ HAPPYCHAT_SET_GEO_LOCATION ]: ( state, action ) => action.geoLocation
+	[ HAPPYCHAT_CONNECTED ]: ( state, action ) => {
+		const { user: { geo_location } } = action;
+		if ( geo_location && geo_location.country_long && geo_location.city ) {
+			return geo_location;
+		}
+		return state;
+	}
 }, geoLocationSchema );
 
 /**
