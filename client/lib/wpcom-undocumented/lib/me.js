@@ -184,17 +184,17 @@ UndocumentedMe.prototype.changeUsername = function( username, action, callback )
 /**
  * Get a list of the user's stored cards
  *
- * @param {object} [paygateToken] Payment key
+ * @param {object} [providerToken] Payment key
  * @param {Function} [callback] The callback function
  * @api public
  */
-UndocumentedMe.prototype.storedCardAdd = function( paygateToken, callback ) {
+UndocumentedMe.prototype.storedCardAdd = function( providerToken, callback ) {
 	debug( '/me/stored-cards' );
 
 	return this.wpcom.req.post( {
 		path: '/me/stored-cards'
 	}, {
-		payment_key: paygateToken,
+		payment_key: providerToken,
 		use_for_existing: true
 	}, callback );
 };

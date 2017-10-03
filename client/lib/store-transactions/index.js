@@ -115,12 +115,12 @@ TransactionFlow.prototype._paymentHandlers = {
 		this._pushStep( { name: transactionStepTypes.INPUT_VALIDATION, first: true } );
 		debug( 'submitting transaction with new card' );
 
-		this._createPaygateToken( function( paygateToken ) {
+		this._createPaygateToken( function( paygateData ) {
 			const { name, country, 'postal-code': zip } = newCardDetails;
 
 			this._submitWithPayment( {
 				payment_method: 'WPCOM_Billing_MoneyPress_Paygate',
-				payment_key: paygateToken,
+				payment_key: paygateData.token,
 				name,
 				zip,
 				country
@@ -170,7 +170,7 @@ TransactionFlow.prototype._paymentHandlers = {
 TransactionFlow.prototype._createPaygateToken = function( callback ) {
 	this._pushStep( { name: transactionStepTypes.SUBMITTING_PAYMENT_KEY_REQUEST } );
 
-	createPaygateToken( 'new_purchase', this._initialData.payment.newCardDetails, function( error, paygateToken ) {
+	createPaygateToken( 'new_purchase', this._initialData.payment.newCardDetails, function( error, paygateData ) {
 		if ( error ) {
 			return this._pushStep( {
 				name: transactionStepTypes.RECEIVED_PAYMENT_KEY_RESPONSE,
@@ -180,7 +180,7 @@ TransactionFlow.prototype._createPaygateToken = function( callback ) {
 		}
 
 		this._pushStep( { name: transactionStepTypes.RECEIVED_PAYMENT_KEY_RESPONSE } );
-		callback( paygateToken );
+		callback( paygateData );
 	}.bind( this ) );
 };
 
@@ -261,7 +261,7 @@ function createPaygateToken( requestType, cardDetails, callback ) {
 			return callback( new Error( 'Paygate Response Error: ' + data.error_msg ) );
 		}
 
-		callback( null, data.token );
+		callback( null, data );
 	}
 
 	function onFailure() {
@@ -300,6 +300,15 @@ function createEbanxToken( requestType, cardDetails, callback ) {
 			const errorMessage = ebanxResponse.error.err.status_message || ebanxResponse.error.err.message;
 			callback( new Error( 'Ebanx Request Error: ' + errorMessage ) );
 		}
+	}
+}
+
+function createCCToken( requestType, cardDetails, callback ) {
+	switch ( cardDetails.country ) {
+		case 'BR':
+			return createEbanxToken( requestType, cardDetails, callback );
+		default:
+			return createPaygateToken( requestType, cardDetails, callback );
 	}
 }
 
@@ -354,8 +363,7 @@ function fullCreditsPayment() {
 }
 
 export default {
-	createPaygateToken,
-	createEbanxToken,
+	createCCToken,
 	fullCreditsPayment,
 	hasDomainDetails,
 	newCardPayment,

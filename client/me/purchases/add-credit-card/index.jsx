@@ -12,7 +12,7 @@ import React, { Component, PropTypes } from 'react';
 import { addStoredCard } from 'state/stored-cards/actions';
 import analytics from 'lib/analytics';
 import { concatTitle } from 'lib/react-helpers';
-import { createPaygateToken, createEbanxToken } from 'lib/store-transactions';
+import { createCCToken } from 'lib/store-transactions';
 import CreditCardForm from 'blocks/credit-card-form';
 import DocumentHead from 'components/data/document-head';
 import HeaderCake from 'components/header-cake';
@@ -27,8 +27,7 @@ class AddCreditCard extends Component {
 
 	constructor( props ) {
 		super( props );
-		this.createPaygateToken = curry( createPaygateToken )( 'card_add' );
-		this.createEbanxToken = curry( createEbanxToken )( 'card_add' );
+		this.createCCToken = curry( createCCToken )( 'card_add' );
 	}
 
 	goToBillingHistory() {
@@ -47,7 +46,7 @@ class AddCreditCard extends Component {
 				<HeaderCake onClick={ this.goToBillingHistory }>{ titles.addCreditCard }</HeaderCake>
 
 				<CreditCardForm
-					createPaygateToken={ this.createPaygateToken }
+					createCCToken={ this.createCCToken }
 					recordFormSubmitEvent={ this.recordFormSubmitEvent }
 					saveStoredCard={ this.props.addStoredCard }
 					successCallback={ this.goToBillingHistory }

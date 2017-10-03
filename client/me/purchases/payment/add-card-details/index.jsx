@@ -61,7 +61,7 @@ class AddCardDetails extends PurchaseCardDetails {
 
 				<CreditCardForm
 					apiParams={ this.getApiParams() }
-					createPaygateToken={ this.createPaygateToken }
+					createCCToken={ this.createCCToken }
 					recordFormSubmitEvent={ this.recordFormSubmitEvent }
 					successCallback={ this.successCallback }
 				/>
