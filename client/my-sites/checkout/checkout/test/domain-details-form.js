@@ -20,7 +20,7 @@ jest.mock( 'lib/wp', () => {
  * External Dependencies
  */
 import React from 'react';
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import { shallow } from 'enzyme';
 import { identity, merge } from 'lodash';
 
@@ -162,6 +162,28 @@ describe( 'Domain Details Form', () => {
 
 		useSandbox( ( sandbox ) => {
 			needsOnlyGoogleAppsDetailsStub = sandbox.stub( DomainDetailsForm.prototype, 'needsOnlyGoogleAppsDetails' );
+		} );
+
+		it( 'should render US address with state field when countryCode is US/AU/CA', () => {
+			[ 'US', 'CA', 'AU' ].forEach( ( countryCode ) => {
+				const wrapper = shallow( <DomainDetailsForm { ...defaultProps } contactDetails={ { countryCode } } /> ),
+					stateInput = wrapper.find( '[name="state"]' );
+
+				expect( wrapper.find( 'PaymentBox' ).get( 0 ).props.classSet ).to.not.contain( 'is-international-address' );
+				assert.equal( stateInput.length,
+					1,
+					`For ${ countryCode } [name="state"] should be present` );
+				expect( stateInput.get( 0 ).props.countryCode ).to.equal( countryCode );
+			} );
+		} );
+
+		it( 'should render International address format without state field when countryCode is not US/AU/CA', () => {
+			[ 'DE', 'BR', '' ].forEach( ( countryCode ) => {
+				const wrapper = shallow( <DomainDetailsForm { ...defaultProps } contactDetails={ { countryCode } } /> );
+
+				expect( wrapper.find( 'PaymentBox' ).get( 0 ).props.classSet ).to.contain( 'is-international-address' );
+				expect( wrapper.find( '[name="state"]' ) ).to.have.length( 0 );
+			} );
 		} );
 
 		it( 'should not render address fieldset with no country data', () => {
