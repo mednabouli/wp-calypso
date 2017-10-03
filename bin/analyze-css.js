@@ -7,6 +7,7 @@ const execSync = require( 'child_process' ).execSync;
 const fs = require( 'fs-extra' );
 const glob = require( 'glob' );
 const path = require( 'path' );
+const entries = require( 'lodash/entries' );
 
 /**
  * Constants
@@ -115,18 +116,35 @@ const rules = fragments.reduce( ( result, fragment ) => {
 
 	const file = normalizePath( rule.file );
 
-	let content = rule.content;
+	let length = rule.content.length;
 
 	if ( result.has( file ) ) {
-		content = result.get( file ) + '\n\n' + content;
+		length = result.get( file ) + length;
 	}
 
-	return result.set( file, content );
+	return result.set( file, length );
 }, new Map() );
 
 console.log( '> Generating CSS files' );
+const accumulator = {};
+rules.forEach( ( bytes, file ) => {
+	const relativePath = file.replace( TEMP_DIRECTORY, '' ).slice( 1 );
+	const pathParts = relativePath.split( path.sep );
 
-rules.forEach( ( content, file ) => {
-	fs.ensureFileSync( file );
-	fs.writeFileSync( file, content );
+	while ( pathParts.pop() ) {
+		const pathSegment = pathParts.join( path.sep );
+
+		if ( ! ( pathSegment in accumulator ) ) {
+			accumulator[ pathSegment ] = 0;
+		}
+
+		accumulator[ pathSegment ] += bytes;
+	}
 } );
+
+entries( accumulator )
+	.sort( ( a, b ) => b[1] - a[1] )
+	.slice( 1, 20 )
+	.forEach( item => {
+		console.log( `${ item[0] }\t=> ${ item[1] / 1024 } KBytes` );
+	} );
