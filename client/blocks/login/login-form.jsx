@@ -121,7 +121,7 @@ export class LoginForm extends Component {
 		this.props.loginUser( usernameOrEmail, password, rememberMe, redirectTo ).then( () => {
 			this.props.recordTracksEvent( 'calypso_login_block_login_form_success' );
 
-			onSuccess();
+			onSuccess( redirectTo );
 		} ).catch( error => {
 			this.props.recordTracksEvent( 'calypso_login_block_login_form_failure', {
 				error_code: error.code,
