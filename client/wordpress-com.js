@@ -98,35 +98,40 @@ const sections = [
 		paths: [ '/settings/writing', '/settings/taxonomies' ],
 		module: 'my-sites/site-settings/settings-writing',
 		secondary: true,
-		group: 'sites'
+		group: 'sites',
+		css: 'site-settings'
 	},
 	{
 		name: 'settings-discussion',
 		paths: [ '/settings/discussion' ],
 		module: 'my-sites/site-settings/settings-discussion',
 		secondary: true,
-		group: 'sites'
+		group: 'sites',
+		css: 'site-settings'
 	},
 	{
 		name: 'settings-traffic',
 		paths: [ '/settings/traffic', '/settings/seo', '/settings/analytics' ],
 		module: 'my-sites/site-settings/settings-traffic',
 		secondary: true,
-		group: 'sites'
+		group: 'sites',
+		css: 'site-settings'
 	},
 	{
 		name: 'settings-security',
 		paths: [ '/settings/security' ],
 		module: 'my-sites/site-settings/settings-security',
 		secondary: true,
-		group: 'sites'
+		group: 'sites',
+		css: 'site-settings'
 	},
 	{
 		name: 'settings',
 		paths: [ '/settings' ],
 		module: 'my-sites/site-settings',
 		secondary: true,
-		group: 'sites'
+		group: 'sites',
+		css: 'site-settings'
 	},
 	{
 		name: 'sharing',
