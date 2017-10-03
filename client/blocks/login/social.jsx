@@ -132,9 +132,10 @@ class SocialLoginForm extends Component {
 		const { redirectTo } = this.props;
 		// If calypso is loaded in a popup, we don't want to open a second popup for social login
 		// let's use the redirect flow instead in that case.
-		const isPopup = typeof window !== 'undefined' && window.opener && window.opener !== window;
+		//const isPopup = typeof window !== 'undefined' && window.opener && window.opener !== window;
+		const isPopup = typeof window !== 'undefined';
 		const loginCallbackRoute = login( { isNative: true, socialService: 'google' } );
-		const redirectUri = isPopup ? `https://${ config( 'hostname' ) + loginCallbackRoute }` : null;
+		const redirectUri = isPopup ? `https://${ ( typeof window !== 'undefined' && window.location.host ) + loginCallbackRoute }` : null;
 
 		return (
 			<div className="login__social">
