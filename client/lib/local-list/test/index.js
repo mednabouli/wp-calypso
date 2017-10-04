@@ -19,7 +19,7 @@ jest.mock( 'store', () => {
 import { assert } from 'chai';
 
 /**
- * Internal dependecies
+ * Internal dependencies
  */
 import LocalList from '../';
 
