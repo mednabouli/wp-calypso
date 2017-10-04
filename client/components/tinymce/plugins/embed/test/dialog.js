@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import Dialog from 'components/dialog';
 import React from 'react';
-import FormTextInput from 'components/forms/form-text-input';
 import { assert } from 'chai';
 import { shallow } from 'enzyme';
 import { identity, noop } from 'lodash';
@@ -12,6 +10,8 @@ import { spy } from 'sinon';
 /**
  * Internal dependencies
  */
+import Dialog from 'components/dialog';
+import FormTextInput from 'components/forms/form-text-input';
 import { EmbedDialog } from '../dialog';
 
 describe( 'EmbedDialog', function() {

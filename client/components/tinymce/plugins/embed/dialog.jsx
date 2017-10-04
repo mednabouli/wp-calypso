@@ -4,6 +4,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { localize } from 'i18n-calypso';
+import { debounce } from 'lodash';
 
 /**
  * Internal dependencies
@@ -54,10 +55,12 @@ export class EmbedDialog extends React.Component {
 	};
 
 	onChangeEmbedUrl = ( event ) => {
-		this.setState( {
-			embedUrl: event.target.value,
-		} );
+		this.debouncedOnChangeEmbedUrl( event.target.value );
 	};
+
+	debouncedOnChangeEmbedUrl = debounce( ( newUrl ) => {
+		this.setState( { embedUrl: newUrl } );
+	}, 500 );
 
 	onUpdate = () => {
 		this.props.onUpdate( this.state.embedUrl );

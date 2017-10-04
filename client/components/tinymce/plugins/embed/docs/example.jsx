@@ -2,14 +2,14 @@
  * External dependencies
  */
 import React, { PureComponent } from 'react';
-import { identity, noop } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import Button from 'components/button';
 import Card from 'components/card';
-import { EmbedDialog } from '../dialog';
+import EmbedDialog from '../dialog';
 
 export default class EmbedDialogExample extends PureComponent {
 	state = {
@@ -42,7 +42,6 @@ export default class EmbedDialogExample extends PureComponent {
 					isVisible={ this.state.showDialog }
 					onCancel={ this.onCancel }
 					onUpdate={ this.onUpdate }
-					translate={ identity }
 				/>
 			</Card>
 		);
