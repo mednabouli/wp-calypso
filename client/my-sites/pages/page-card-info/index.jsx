@@ -33,7 +33,7 @@ const getContentLink = ( state, siteId, page ) => {
 
 function PageCardInfo( { translate, moment, page, showTimestamp, isFront, isPosts, siteUrl, contentLink } ) {
 	const iconSize = 12;
-	const renderPageTimestamp = function() {
+	const renderFutureTimestamp = function() {
 		if ( page.status === 'future' ) {
 			return (
 				<PostRelativeTimeStatus
@@ -43,14 +43,7 @@ function PageCardInfo( { translate, moment, page, showTimestamp, isFront, isPost
 			);
 		}
 
-		return (
-			<span className="page-card-info__item">
-				<Gridicon icon="time" size={ iconSize } className="page-card-info__item-icon" />
-				<span className="page-card-info__item-text">
-					{ moment( page.modified ).fromNow() }
-				</span>
-			</span>
-		);
+		return null;
 	};
 
 	return (
@@ -61,7 +54,15 @@ function PageCardInfo( { translate, moment, page, showTimestamp, isFront, isPost
 				</div>
 			}
 			<div>
-				{ showTimestamp && renderPageTimestamp() }
+				{ showTimestamp && (
+					renderFutureTimestamp() ||
+					<span className="page-card-info__item">
+						<Gridicon icon="time" size={ iconSize } className="page-card-info__item-icon" />
+						<span className="page-card-info__item-text">
+							{ moment( page.modified ).fromNow() }
+						</span>
+					</span>
+				) }
 				{ isFront &&
 					<span className="page-card-info__item">
 						<Gridicon icon="house" size={ iconSize } className="page-card-info__item-icon" />
