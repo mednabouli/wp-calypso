@@ -140,7 +140,7 @@ export const dispatchRequest = ( initiator, onSuccess, onError, options ) => ( s
 	}
 
 	const data = getData( action );
-	if ( data ) {
+	if ( null !== data ) {
 		try {
 			return onSuccess( store, action, fromApi( data ) );
 		} catch ( err ) {
