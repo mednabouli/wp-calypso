@@ -23,6 +23,18 @@ describe( 'WPCOM HTTP Data Layer', () => {
 
 			expect( getData( action ) ).to.be.undefined;
 		} );
+		it( 'should return an empty string', () => {
+			const data = '';
+			const action = { type: 'SLUGGER', meta: { dataLayer: { data } } };
+
+			expect( getData( action ) ).to.equal( data );
+		} );
+		it( 'should return null', () => {
+			const data = null;
+			const action = { type: 'SLUGGER', meta: { dataLayer: { data } } };
+
+			expect( getData( action ) ).to.equal( data );
+		} );
 	} );
 
 	describe( '#getError', () => {
@@ -37,6 +49,20 @@ describe( 'WPCOM HTTP Data Layer', () => {
 			const action = { type: 'SLUGGER' };
 
 			expect( getError( action ) ).to.be.undefined;
+		} );
+
+		it( 'should return an empty string if the error is an empty string', () => {
+			const error = '';
+			const action = { type: 'SLUGGER', meta: { dataLayer: { error } } };
+
+			expect( getError( action ) ).to.equal( error );
+		} );
+
+		it( 'should return null if the error is null', () => {
+			const error = null;
+			const action = { type: 'SLUGGER', meta: { dataLayer: { error } } };
+
+			expect( getError( action ) ).to.equal( error );
 		} );
 	} );
 
