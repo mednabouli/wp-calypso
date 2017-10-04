@@ -345,7 +345,7 @@ function safeLink( link ) {
 	if ( safeLinkRe.test( link ) ) {
 		return link;
 	}
-	return null;
+	return undefined;
 }
 
 module.exports = {
