@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { find } from 'lodash';
+import { find, get } from 'lodash';
 import { localize } from 'i18n-calypso';
 
 /**
@@ -22,6 +22,11 @@ import ProgressBar from 'components/progress-bar';
 import QueryJetpackPlugins from 'components/data/query-jetpack-plugins';
 import SetupHeader from './setup-header';
 import { setFinishedInstallOfRequiredPlugins } from 'woocommerce/state/sites/setup-choices/actions';
+import QuerySites from 'components/data/query-sites';
+import { getSiteOptions } from 'state/selectors';
+import { getAutomatedTransferStatus as fetchAutomatedTransferStatus } from 'state/automated-transfer/actions';
+import { getAutomatedTransferStatus } from 'state/automated-transfer/selectors';
+import { transferStates } from 'state/automated-transfer/constants';
 
 class RequiredPluginsInstallView extends Component {
 	static propTypes = {
@@ -38,6 +43,7 @@ class RequiredPluginsInstallView extends Component {
 			toInstall: [],
 			workingOn: '',
 			stepIndex: 0,
+			requestedTransferStatus: false,
 		};
 		this.updateTimer = false;
 	}
@@ -49,6 +55,19 @@ class RequiredPluginsInstallView extends Component {
 	componentWillUnmount = () => {
 		this.destroyUpdateTimer();
 	}
+
+	componentWillReceiveProps = ( nextProps ) => {
+		if ( nextProps.atomicStoreDoingTransfer && ! this.state.requestedTransferStatus ) {
+			this.props.fetchAutomatedTransferStatus( this.props.siteId );
+
+			this.setState( {
+				engineState: 'DOING_TRANSFER',
+				requestedTransferStatus: true,
+				stepIndex: 1,
+				numTotalSteps: 6,
+			} );
+		}
+	};
 
 	createUpdateTimer = () => {
 		if ( this.updateTimer ) {
@@ -78,6 +97,21 @@ class RequiredPluginsInstallView extends Component {
 			'taxjar-simplified-taxes-for-woocommerce': translate( 'TaxJar - Sales Tax Automation for WooCommerce' ),
 		};
 	}
+
+	doTransferStatusPolling = () => {
+		const { automatedTransferStatus } = this.props;
+
+		const { COMPLETE } = transferStates;
+
+		if ( automatedTransferStatus === COMPLETE ) {
+			this.setState( {
+				engineState: 'INITIALIZING',
+				workingOn: '',
+				stepIndex: 3,
+				numTotalSteps: 6,
+			} );
+		}
+	};
 
 	doInitialization = () => {
 		const { site, sitePlugins, wporg } = this.props;
@@ -272,6 +306,9 @@ class RequiredPluginsInstallView extends Component {
 
 	updateEngine = () => {
 		switch ( this.state.engineState ) {
+			case 'DOING_TRANSFER':
+				this.doTransferStatusPolling();
+				break;
 			case 'INITIALIZING':
 				this.doInitialization();
 				break;
@@ -289,8 +326,9 @@ class RequiredPluginsInstallView extends Component {
 
 	getProgress = () => {
 		const { engineState, stepIndex, numTotalSteps } = this.state;
+		const { atomicStoreDoingTransfer } = this.props;
 
-		if ( 'INITIALIZING' === engineState ) {
+		if ( ! atomicStoreDoingTransfer && 'INITIALIZING' === engineState ) {
 			return 0;
 		}
 
@@ -298,13 +336,22 @@ class RequiredPluginsInstallView extends Component {
 	}
 
 	startSetup = () => {
+		const { atomicStoreDoingTransfer } = this.props;
+
 		analytics.tracks.recordEvent( 'calypso_woocommerce_dashboard_action_click', {
 			action: 'initial-setup',
 		} );
+
+		let engineState = 'INITIALIZING';
+
+		if ( atomicStoreDoingTransfer ) {
+			engineState = 'DOING_TRANSFER';
+		}
+
 		this.setState( {
-			engineState: 'INITIALIZING',
+			engineState
 		} );
-	}
+	};
 
 	renderConfirmScreen = () => {
 		const { translate } = this.props;
@@ -344,6 +391,7 @@ class RequiredPluginsInstallView extends Component {
 		return (
 			<div className="card dashboard__setup-wrapper">
 				{ site && <QueryJetpackPlugins siteIds={ [ site.ID ] } /> }
+				{ site && <QuerySites siteId={ site.ID } /> }
 				<SetupHeader
 					imageSource={ '/calypso/images/extensions/woocommerce/woocommerce-store-creation.svg' }
 					imageWidth={ 160 }
@@ -359,12 +407,20 @@ class RequiredPluginsInstallView extends Component {
 
 function mapStateToProps( state ) {
 	const site = getSelectedSiteWithFallback( state );
-	const sitePlugins = site ? getPlugins( state, [ site.ID ] ) : [];
+	const siteId = site.ID;
+
+	const sitePlugins = site ? getPlugins( state, siteId ) : [];
+	const siteOptions = getSiteOptions( state, siteId );
+
+	const atomicStoreDoingTransfer = get( siteOptions, [ 'atomic_store_doing_transfer' ], false );
 
 	return {
 		site,
+		siteId,
 		sitePlugins,
+		atomicStoreDoingTransfer,
 		wporg: state.plugins.wporg.items,
+		automatedTransferStatus: getAutomatedTransferStatus( state, siteId ),
 	};
 }
 
@@ -375,6 +431,7 @@ function mapDispatchToProps( dispatch ) {
 			fetchPluginData,
 			installPlugin,
 			setFinishedInstallOfRequiredPlugins,
+			fetchAutomatedTransferStatus,
 		},
 		dispatch
 	);
