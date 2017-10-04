@@ -18,10 +18,10 @@ describe( 'WPCOM HTTP Data Layer', () => {
 			expect( getData( action ) ).to.equal( data );
 		} );
 
-		it( 'should return null if no response data available', () => {
+		it( 'should return undefined if no response data available', () => {
 			const action = { type: 'SLUGGER' };
 
-			expect( getData( action ) ).to.be.null;
+			expect( getData( action ) ).to.be.undefined;
 		} );
 	} );
 
@@ -33,10 +33,10 @@ describe( 'WPCOM HTTP Data Layer', () => {
 			expect( getError( action ) ).to.equal( error );
 		} );
 
-		it( 'should return null if no error data available', () => {
+		it( 'should return undefined if no error data available', () => {
 			const action = { type: 'SLUGGER' };
 
-			expect( getError( action ) ).to.be.null;
+			expect( getError( action ) ).to.be.undefined;
 		} );
 	} );
 
