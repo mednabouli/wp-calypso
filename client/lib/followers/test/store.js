@@ -14,7 +14,7 @@ import site from './lib/mock-site';
 /**
  * Internal dependencies
  */
-var options = { siteId: site.ID };
+const options = { siteId: site.ID };
 
 describe( 'WPCOM Followers Store', function() {
 	var Dispatcher, FollowersStore;

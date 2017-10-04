@@ -3,14 +3,7 @@
 /**
  * External dependencies
  */
-import chai from 'chai';
-
-/** @jest-environment jsdom */
-
-/**
- * External dependencies
- */
-var expect = chai.expect;
+import { expect } from 'chai';
 
 /**
  * Internal dependencies
@@ -74,4 +67,3 @@ describe( 'highlight', function() {
 		} );
 	} );
 } );
-
