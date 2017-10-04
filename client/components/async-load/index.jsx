@@ -7,8 +7,12 @@ import { omit } from 'lodash';
 
 export default class AsyncLoad extends Component {
 	static propTypes = {
+		placeholder: PropTypes.node,
 		require: PropTypes.func.isRequired,
-		placeholder: PropTypes.node
+	};
+
+	static defaultProps = {
+		placeholder: <div className="async-load__placeholder" />
 	};
 
 	constructor() {
@@ -40,6 +44,7 @@ export default class AsyncLoad extends Component {
 
 	require() {
 		const requireFunction = this.props.require;
+
 		requireFunction( ( component ) => {
 			if ( this.props.require === requireFunction ) {
 				this.setState( { component } );
@@ -49,14 +54,11 @@ export default class AsyncLoad extends Component {
 
 	render() {
 		if ( this.state.component ) {
-			const props = omit( this.props, [ 'require', 'placeholder' ] );
+			const props = omit( this.props, [ 'placeholder', 'require' ] );
+
 			return <this.state.component { ...props } />;
 		}
 
-		if ( this.props.placeholder ) {
-			return this.props.placeholder;
-		}
-
-		return <div className="async-load" />;
+		return this.props.placeholder;
 	}
 }
