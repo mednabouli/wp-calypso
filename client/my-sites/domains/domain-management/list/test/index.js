@@ -21,7 +21,6 @@ import { Provider as ReduxProvider } from 'react-redux';
  */
 import { createReduxStore } from 'state';
 import { useSandbox } from 'test/helpers/use-sinon';
-
 import {
 	PRIMARY_DOMAIN_CHANGE_SUCCESS,
 	PRIMARY_DOMAIN_CHANGE_FAIL,

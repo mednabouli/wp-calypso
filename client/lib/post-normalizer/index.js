@@ -2,7 +2,6 @@
  * External Dependencies
  */
 import async from 'async';
-
 import debugFactory from 'debug';
 const debug = debugFactory( 'calypso:post-normalizer' );
 /**

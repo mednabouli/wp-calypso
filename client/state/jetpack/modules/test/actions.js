@@ -26,7 +26,6 @@ import {
 	JETPACK_MODULES_REQUEST_FAILURE
 } from 'state/action-types';
 import useNock from 'test/helpers/use-nock';
-
 import {
 	api_module_list_response as API_MODULE_LIST_RESPONSE_FIXTURE
 } from './fixture';

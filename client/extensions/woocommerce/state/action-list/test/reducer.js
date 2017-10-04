@@ -8,7 +8,6 @@ import { expect } from 'chai';
  */
 import reducer from '../reducer';
 import * as fxt from 'woocommerce/state/action-list/test/fixtures';
-
 import {
 	actionListClear,
 	actionListAnnotate,

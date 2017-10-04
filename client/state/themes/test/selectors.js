@@ -42,7 +42,6 @@ import {
 	getWpcomParentThemeId,
 } from '../selectors';
 import ThemeQueryManager from 'lib/query-manager/theme';
-
 import { PLAN_FREE, PLAN_PREMIUM, PLAN_BUSINESS } from 'lib/plans/constants';
 
 const twentyfifteen = {

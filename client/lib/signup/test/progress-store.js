@@ -6,7 +6,6 @@ jest.mock( 'signup/config/steps', () => require( './mocks/signup/config/steps' )
  * External dependencies
  */
 import sinon from 'sinon';
-
 import assert from 'assert';
 import { defer, find, last, omit } from 'lodash';
 

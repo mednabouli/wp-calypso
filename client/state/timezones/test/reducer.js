@@ -8,7 +8,6 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import { useSandbox } from 'test/helpers/use-sinon';
-
 import timezonesReducer, {
 	byContinents,
 	labels,

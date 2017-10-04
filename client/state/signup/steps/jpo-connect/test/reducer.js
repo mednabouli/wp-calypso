@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { expect } from 'chai';
-
 import {
 	SIGNUP_COMPLETE_RESET,
 	SIGNUP_STEPS_JPO_CONNECT_SET,

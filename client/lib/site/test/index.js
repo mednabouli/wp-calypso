@@ -3,7 +3,6 @@
  */
 import { expect } from 'chai';
 import sinon from 'sinon';
-
 import Site from '..';
 
 describe( 'Calypso Site', () => {

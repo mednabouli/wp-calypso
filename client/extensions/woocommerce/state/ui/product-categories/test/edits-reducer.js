@@ -7,7 +7,6 @@ import { expect } from 'chai';
  * Internal dependencies
  */
 import reducer from '../edits-reducer';
-
 import {
 	editProductCategory,
 	clearProductCategoryEdits,

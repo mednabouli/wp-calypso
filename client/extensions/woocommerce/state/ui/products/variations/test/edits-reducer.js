@@ -8,7 +8,6 @@ import { set, isEqual } from 'lodash';
  * Internal dependencies
  */
 import reducer from '../edits-reducer';
-
 import { editProductVariation, clearProductVariationEdits } from '../actions';
 import {
 	editProduct,

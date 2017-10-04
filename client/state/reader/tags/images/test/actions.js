@@ -16,7 +16,6 @@ import {
 	READER_TAG_IMAGES_RECEIVE,
 } from 'state/action-types';
 import { receiveTagImages, requestTagImages } from '../actions';
-
 import sampleSuccessResponse from './sample-responses.json';
 
 describe( 'actions', () => {

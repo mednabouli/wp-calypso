@@ -15,7 +15,6 @@ import {
 	JETPACK_SYNC_STATUS_ERROR,
 } from 'state/action-types';
 import useNock from 'test/helpers/use-nock';
-
 import { useSandbox } from 'test/helpers/use-sinon';
 
 describe( 'actions', () => {

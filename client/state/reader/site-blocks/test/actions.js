@@ -20,7 +20,6 @@ import {
 	NOTICE_CREATE,
 } from 'state/action-types';
 import { requestSiteBlock, requestSiteUnblock } from '../actions';
-
 import sampleSuccessResponse from './sample-success-response.json';
 import sampleFailureResponse from './sample-failure-response.json';
 

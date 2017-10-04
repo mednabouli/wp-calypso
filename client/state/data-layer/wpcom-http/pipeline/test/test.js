@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { expect } from 'chai';
-
 import {
 	processInboundChain,
 	processOutboundChain,

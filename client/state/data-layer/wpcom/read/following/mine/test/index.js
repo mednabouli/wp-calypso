@@ -11,7 +11,6 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import { READER_FOLLOWS_SYNC_START } from 'state/action-types';
-
 import {
 	receiveFollows as receiveFollowsAction,
 	follow,
@@ -20,7 +19,6 @@ import {
 import { http } from 'state/data-layer/wpcom-http/actions';
 import { NOTICE_CREATE } from 'state/action-types';
 import { subscriptionsFromApi } from '../utils';
-
 import {
 	isSyncingFollows,
 	requestPage,

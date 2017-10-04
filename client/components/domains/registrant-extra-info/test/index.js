@@ -4,7 +4,6 @@
 import React from 'react';
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
-
 import RegistrantExtraInfoFrForm from '../fr-form';
 import RegistrantExtraInfoCaForm from '../ca-form';
 

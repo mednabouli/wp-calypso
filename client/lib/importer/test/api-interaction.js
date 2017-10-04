@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import Dispatcher from 'dispatcher';
 import { partial } from 'lodash';
-
 import { nock, useNock } from 'test/helpers/use-nock';
 
 import { fetchState } from '../actions';

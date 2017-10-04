@@ -8,7 +8,6 @@ import sinon from 'sinon';
  * Internal dependencies
  */
 import { useSandbox } from 'test/helpers/use-sinon';
-
 import {
 	accountRecoverySettingsFetch,
 	accountRecoverySettingsFetchSuccess,

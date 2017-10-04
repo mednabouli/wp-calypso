@@ -26,7 +26,6 @@ import {
 } from 'state/action-types';
 
 import { dummyData, dummyNewPhone, dummyNewEmail } from './test-data';
-
 import reducer from '../reducer';
 
 describe( '#account-recovery reducer fetch:', () => {
